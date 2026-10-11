@@ -5,6 +5,9 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    define: {
+      __BUILD_TIME__: JSON.stringify(Date.now().toString()),
+    },
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

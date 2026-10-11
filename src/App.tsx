@@ -30,7 +30,8 @@ import {
 } from './types';
 import { ShieldCheck, Shield } from 'lucide-react';
 
-const CURRENT_APP_VERSION = '2026.10.11.v5';
+declare const __BUILD_TIME__: string;
+const CURRENT_APP_VERSION = __BUILD_TIME__;
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('course');
