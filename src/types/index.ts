@@ -68,6 +68,11 @@ export interface Course {
   regulatoryFramework: string[];
   description: string;
   modules: Module[];
+  thematicProfile?: {
+    title: string;
+    focus: string;
+    sourceFileName?: string;
+  };
 }
 
 export interface NonConformityItem {
