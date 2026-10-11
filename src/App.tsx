@@ -30,6 +30,8 @@ import {
 } from './types';
 import { ShieldCheck, Shield } from 'lucide-react';
 
+const CURRENT_APP_VERSION = '2026.10.11.v3';
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('course');
 
@@ -57,6 +59,10 @@ export default function App() {
 
   // Students list state (managed by Gestor)
   const [students, setStudents] = useState<StudentUser[]>(() => {
+    const version = localStorage.getItem('explorer_app_version');
+    if (version !== CURRENT_APP_VERSION) {
+      return DEFAULT_STUDENTS;
+    }
     const saved = localStorage.getItem('sgi_all_students');
     if (saved) {
       try {
@@ -70,17 +76,24 @@ export default function App() {
 
   // Multiple Courses state
   const [courses, setCourses] = useState<Course[]>(() => {
+    const version = localStorage.getItem('explorer_app_version');
     const saved = localStorage.getItem('sgi_all_courses_list');
-    if (saved) {
+    if (saved && version === CURRENT_APP_VERSION) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          const hasIsm = parsed.some((c: Course) => c.id === DEFAULT_ISM_COURSE.id);
+          if (!hasIsm) {
+            return [...parsed, DEFAULT_ISM_COURSE];
+          }
           return parsed;
         }
       } catch (e) {
         console.error(e);
       }
     }
+    // Auto upgrade to latest official courses
+    localStorage.setItem('explorer_app_version', CURRENT_APP_VERSION);
     return [DEFAULT_COURSE, DEFAULT_ISM_COURSE];
   });
 
@@ -126,6 +139,10 @@ export default function App() {
 
   // Persistent Certificate Template state
   const [certificateTemplate, setCertificateTemplate] = useState<CertificateTemplate>(() => {
+    const version = localStorage.getItem('explorer_app_version');
+    if (version !== CURRENT_APP_VERSION) {
+      return DEFAULT_CERTIFICATE_TEMPLATE;
+    }
     const saved = localStorage.getItem('sgi_cert_template');
     if (saved) {
       try {
@@ -291,10 +308,19 @@ export default function App() {
   };
 
   const handleResetCourse = () => {
-    setCourses([DEFAULT_COURSE, DEFAULT_ISM_COURSE]);
-    setNonConformities(INITIAL_NON_CONFORMITIES);
-    setAvatars(INITIAL_INTERVIEW_AVATARS);
-    setCertificateTemplate(DEFAULT_CERTIFICATE_TEMPLATE);
+    if (confirm('Deseja sincronizar e recarregar todos os treinamentos e modelos oficiais da EXPLORER SOLUTIONS com as últimas atualizações?')) {
+      localStorage.setItem('explorer_app_version', CURRENT_APP_VERSION);
+      localStorage.setItem('sgi_all_courses_list', JSON.stringify([DEFAULT_COURSE, DEFAULT_ISM_COURSE]));
+      localStorage.setItem('sgi_all_students', JSON.stringify(DEFAULT_STUDENTS));
+      localStorage.setItem('sgi_cert_template', JSON.stringify(DEFAULT_CERTIFICATE_TEMPLATE));
+      setCourses([DEFAULT_COURSE, DEFAULT_ISM_COURSE]);
+      setActiveCourseId(DEFAULT_COURSE.id);
+      setStudents(DEFAULT_STUDENTS);
+      setNonConformities(INITIAL_NON_CONFORMITIES);
+      setAvatars(INITIAL_INTERVIEW_AVATARS);
+      setCertificateTemplate(DEFAULT_CERTIFICATE_TEMPLATE);
+      alert('Plataforma sincronizada com sucesso com a versão mais recente!');
+    }
   };
 
   const handleUpdateCourse = (updated: Course) => {
@@ -625,8 +651,15 @@ export default function App() {
               <span>— {isAdminMode ? 'Painel de Gestão e Certificação' : 'Portal de Capacitação do Aluno'}</span>
             </div>
 
-            <div className="text-xs text-slate-400">
+            <div className="flex items-center gap-3 text-xs text-slate-400">
               <span className="font-semibold text-slate-300">EXPLORER SOLUTIONS</span> • Plataforma de Treinamento
+              <button
+                onClick={handleResetCourse}
+                className="text-[10px] text-slate-500 hover:text-amber-400 underline transition-colors cursor-pointer"
+                title="Sincronizar dados e carregar as últimas atualizações do sistema"
+              >
+                Sincronizar Atualizações
+              </button>
             </div>
           </div>
 
