@@ -26,7 +26,9 @@ import {
   Users,
   Anchor,
   CheckCircle2,
-  HelpCircle
+  HelpCircle,
+  Edit,
+  Plus
 } from 'lucide-react';
 
 interface CourseViewerProps {
@@ -45,6 +47,7 @@ interface CourseViewerProps {
   onSelectCourse?: (courseId: string) => void;
   currentStudent?: StudentUser | null;
   onOpenStudentManager?: () => void;
+  onNavigateToEditor?: (courseId?: string, openCreateModal?: boolean) => void;
 }
 
 export const CourseViewer: React.FC<CourseViewerProps> = ({
@@ -61,7 +64,8 @@ export const CourseViewer: React.FC<CourseViewerProps> = ({
   courses = [],
   onSelectCourse,
   currentStudent,
-  onOpenStudentManager
+  onOpenStudentManager,
+  onNavigateToEditor
 }) => {
   const [selectedModuleId, setSelectedModuleId] = useState<string>(course.modules[0]?.id || '');
   const [selectedLessonId, setSelectedLessonId] = useState<string>(
@@ -127,9 +131,9 @@ export const CourseViewer: React.FC<CourseViewerProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Course Switcher Pills Bar (if multiple courses available) */}
-      {courses.length > 1 && (
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+      {/* Course Switcher Pills Bar (if multiple courses available or Admin Mode) */}
+      {(courses.length > 1 || isAdminMode) && (
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 shadow-md">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5 pl-1">
               <BookOpen className="w-3.5 h-3.5" />
@@ -137,7 +141,7 @@ export const CourseViewer: React.FC<CourseViewerProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+          <div className="flex items-center gap-2 flex-wrap w-full lg:w-auto">
             {courses.map(c => {
               const isSelected = c.id === course.id;
               const hasPermission =
@@ -167,6 +171,29 @@ export const CourseViewer: React.FC<CourseViewerProps> = ({
                 </button>
               );
             })}
+
+            {/* Quick Actions for Gestor right on the Treinamentos Disponíveis bar */}
+            {isAdminMode && (
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-800/80">
+                <button
+                  onClick={() => onNavigateToEditor?.(course.id, false)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-900/40 hover:bg-purple-800/60 text-purple-300 border border-purple-700/60 flex items-center gap-1.5 transition-all"
+                  title="Editar dados, módulos e aulas deste treinamento selecionado"
+                >
+                  <Edit className="w-3.5 h-3.5 text-purple-300" />
+                  <span>Editar Treinamento</span>
+                </button>
+
+                <button
+                  onClick={() => onNavigateToEditor?.(undefined, true)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all"
+                  title="Criar e formatar um novo treinamento na plataforma com todos os módulos"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>+ Novo Treinamento</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -257,14 +284,36 @@ export const CourseViewer: React.FC<CourseViewerProps> = ({
                     </span>
                   )}
 
-                  {isAdminMode && onOpenStudentManager && (
-                    <button
-                      onClick={onOpenStudentManager}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-purple-900/60 hover:bg-purple-800 border border-purple-700 text-purple-200 transition-colors font-semibold"
-                    >
-                      <Users className="w-3 h-3 text-purple-300" />
-                      Cadastrar / Gerenciar Alunos
-                    </button>
+                  {isAdminMode && (
+                    <>
+                      {onOpenStudentManager && (
+                        <button
+                          onClick={onOpenStudentManager}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-purple-900/60 hover:bg-purple-800 border border-purple-700 text-purple-200 transition-colors font-semibold"
+                        >
+                          <Users className="w-3 h-3 text-purple-300" />
+                          Cadastrar / Gerenciar Alunos
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => onNavigateToEditor?.(course.id, false)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 transition-colors font-bold shadow-sm"
+                        title="Editar conteúdo, módulos e aulas deste curso"
+                      >
+                        <Edit className="w-3 h-3" />
+                        Editar Este Treinamento
+                      </button>
+
+                      <button
+                        onClick={() => onNavigateToEditor?.(undefined, true)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 transition-all font-extrabold shadow-md shadow-amber-500/20"
+                        title="Formatar e incluir novo treinamento com todos os módulos padrão"
+                      >
+                        <Plus className="w-3 h-3" />
+                        + Formatar Novo Treinamento
+                      </button>
+                    </>
                   )}
 
                   {!isAdminMode && (

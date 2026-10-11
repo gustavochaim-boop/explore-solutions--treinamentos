@@ -13,7 +13,8 @@ import {
   Users,
   ChevronDown,
   CheckCircle,
-  ExternalLink
+  ExternalLink,
+  Plus
 } from 'lucide-react';
 import { Course, StudentUser } from '../types';
 
@@ -160,6 +161,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                   );
                 })}
+
+                {isAdminMode && (
+                  <div className="pt-1.5 mt-1 border-t border-slate-800">
+                    <button
+                      onClick={() => {
+                        onSelectTab('editor');
+                        setIsCourseDropdownOpen(false);
+                      }}
+                      className="w-full text-left p-2 rounded-xl text-xs flex items-center gap-2 text-amber-400 hover:bg-amber-500/10 transition-colors font-bold"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-amber-400" />
+                      <span>+ Formatar Novo Treinamento</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -230,14 +246,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             {isAdminMode ? (
               <button
                 onClick={() => handleTabClick('editor')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   activeTab === 'editor'
-                    ? 'bg-purple-600 text-white shadow-md font-bold'
-                    : 'text-purple-300 hover:text-white hover:bg-slate-800'
+                    ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-md font-extrabold shadow-amber-500/20'
+                    : 'bg-purple-950/40 text-purple-200 border border-purple-800/60 hover:bg-purple-900/60 hover:text-white'
                 }`}
+                title="Editar os treinamentos disponíveis e formatar novos cursos com todos os módulos"
               >
                 <Edit className="w-3.5 h-3.5" />
-                Editar Curso
+                <span>Gestão de Treinamentos</span>
               </button>
             ) : (
               <button

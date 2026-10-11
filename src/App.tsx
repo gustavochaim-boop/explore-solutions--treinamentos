@@ -41,6 +41,7 @@ export default function App() {
   });
   const [isManagerLoginOpen, setIsManagerLoginOpen] = useState<boolean>(false);
   const [isStudentManagerOpen, setIsStudentManagerOpen] = useState<boolean>(false);
+  const [openCreateModalOnEditor, setOpenCreateModalOnEditor] = useState<boolean>(false);
 
   // Student State
   const [isStudentLoginOpen, setIsStudentLoginOpen] = useState<boolean>(false);
@@ -352,6 +353,18 @@ export default function App() {
     setActiveCourseId(duplicated.id);
   };
 
+  const handleNavigateToEditor = (courseId?: string, openCreateModal?: boolean) => {
+    if (courseId) {
+      setActiveCourseId(courseId);
+    }
+    if (openCreateModal) {
+      setOpenCreateModalOnEditor(true);
+    } else {
+      setOpenCreateModalOnEditor(false);
+    }
+    setActiveTab('editor');
+  };
+
   // Video Management (Exclusivo Gestor)
   const handleAddModuleVideo = (moduleId: string, newVideo: EducationalVideo) => {
     setCourses(prevCourses =>
@@ -504,6 +517,7 @@ export default function App() {
             onSelectCourse={setActiveCourseId}
             currentStudent={currentStudent}
             onOpenStudentManager={() => setIsStudentManagerOpen(true)}
+            onNavigateToEditor={handleNavigateToEditor}
           />
         )}
 
@@ -584,6 +598,9 @@ export default function App() {
               onDeleteCourse={handleDeleteCourse}
               onDuplicateCourse={handleDuplicateCourse}
               onResetToDefault={handleResetCourse}
+              initialOpenCreateModal={openCreateModalOnEditor}
+              onCloseCreateModal={() => setOpenCreateModalOnEditor(false)}
+              onNavigateToCourseView={() => setActiveTab('course')}
             />
           ) : (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center max-w-xl mx-auto space-y-4">

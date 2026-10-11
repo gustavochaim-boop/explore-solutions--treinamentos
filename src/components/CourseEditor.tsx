@@ -30,7 +30,8 @@ import {
   ArrowUp,
   ArrowDown,
   Tag,
-  GraduationCap
+  GraduationCap,
+  Eye
 } from 'lucide-react';
 
 interface CourseEditorProps {
@@ -42,6 +43,9 @@ interface CourseEditorProps {
   onDeleteCourse: (courseId: string) => void;
   onDuplicateCourse: (courseId: string) => void;
   onResetToDefault: () => void;
+  initialOpenCreateModal?: boolean;
+  onCloseCreateModal?: () => void;
+  onNavigateToCourseView?: () => void;
 }
 
 export const CourseEditor: React.FC<CourseEditorProps> = ({
@@ -52,7 +56,10 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
   onCreateCourse,
   onDeleteCourse,
   onDuplicateCourse,
-  onResetToDefault
+  onResetToDefault,
+  initialOpenCreateModal,
+  onCloseCreateModal,
+  onNavigateToCourseView
 }) => {
   // Course being currently edited
   const currentCourse = courses.find(c => c.id === activeCourseId) || courses[0];
@@ -94,6 +101,19 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
       }
     }
   }, [currentCourse, activeModuleId]);
+
+  // Sync initialOpenCreateModal
+  React.useEffect(() => {
+    if (initialOpenCreateModal) {
+      resetCreateForm();
+      setIsCreateModalOpen(true);
+    }
+  }, [initialOpenCreateModal]);
+
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
+    onCloseCreateModal?.();
+  };
 
   const triggerToast = (msg: string) => {
     setSaveToast(msg);
@@ -400,6 +420,18 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {/* Voltar e Visualizar no Ambiente do Aluno */}
+            {onNavigateToCourseView && (
+              <button
+                onClick={onNavigateToCourseView}
+                className="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                title="Voltar à tela de visualização do curso para ver a experiência do aluno"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Ver no Ambiente do Aluno</span>
+              </button>
+            )}
+
             {/* Novo Treinamento Button */}
             <button
               onClick={() => {
@@ -1247,7 +1279,7 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
               </div>
 
               <button
-                onClick={() => setIsCreateModalOpen(false)}
+                onClick={handleCloseCreateModal}
                 className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all"
               >
                 <X className="w-5 h-5" />
@@ -1441,7 +1473,7 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
                 <button
                   type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
+                  onClick={handleCloseCreateModal}
                   className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all"
                 >
                   Cancelar
