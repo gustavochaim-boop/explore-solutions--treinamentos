@@ -1,0 +1,6 @@
+{
+  "name": "Plataforma de Treinamento SGI & Emissor de Certificados",
+  "description": "Plataforma editável de treinamento para Auditor Líder de SGI e SGSO Offshore com simulador 3D de não-conformidades e estúdio de certificação personalizável.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
